@@ -65,6 +65,6 @@ There are several files that contain various information related to the complete
 4. timeSeqX.txt (for X = 1..pn; pn is the number of slave processes) contains detailed timing information for each host that is used in debugging and for detailed speedup analysis.
 5. front.txt contains the final front (multiobjective optimization result is the front of solutions - the set of non-dominated solutions from the set of all considered solutions).
 
-## Examples of the previous research
+## Research
 
-1
+1. When using AMS-DEMO please cite: http://www.mitpressjournals.org/doi/abs/10.1162/EVCO_a_00076
