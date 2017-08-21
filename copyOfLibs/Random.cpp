@@ -62,72 +62,63 @@
     }
 */
 
-#ifndef DE_H_INCLUDED
-#define DE_H_INCLUDED
+#include "Random.h"
+#include <ctime>
 
 
-#include "DeBase.h"
-#include "ParallelNumericOptimizer.h"
-
-#include <map>
-
-
-/// ##################################################################################
-/// template class PDe
-/// used as an Algorithm policy for NumericOptimizer<...>;
-///
-template<class Chromosome, class Evaluation>
-class PDe : 
-	// inherit base DE definitions
-	public DeBase<IndividualStruc<Chromosome, typename Evaluation::Value, typename Evaluation::Properties> >, 
-	// make PDe conform the form of ParallelNumericOptimizer
-	public ParallelNumericOptimizer<PDe<Chromosome, Evaluation>, Chromosome, Evaluation> 
-{
-public:
-	friend class ParallelNumericOptimizer<PDe<Chromosome, Evaluation>, Chromosome, Evaluation>;
-	typedef typename ParallelNumericOptimizer<PDe<Chromosome, Evaluation>, Chromosome, Evaluation>::Individual Individual;
+namespace Random {
 	
-protected:
-	size_t parentIndex; // used in generateCandidate function
+	/// class SingleRandom
+	void CRand::setSeed(int seed) {
+		srand(seed);
+		rand();
+	}
 	
-public:
-	PDe();
-
-protected:
-	void performTruncate();
-	void performSelection(size_t targetIndex, Individual trial);
 	
-	Chromosome generateCandidate();
-};
+	unsigned int CRand::randomizeSeed() {
+		unsigned int timeSeed = time(NULL);
+		srand(timeSeed);
+		// throw away first generated number
+		rand();
+		return timeSeed;
+	}
 
+    //#define rotl(r,n) (((r)<<(n)) | ((r)>>((8*sizeof(r))-(n))))
+    template<class R, class N>
+    R rotl(R r, N n) {
+        return (((r)<<(n)) | ((r)>>((8*sizeof(r))-(n))));
+    }
+    
+    void RersResrResdra::setSeed(uint32_t seed) {
+        xx = 914489ULL; 
+        yy = 8675416ULL; 
+        zz = 439754684ULL;
+        for (unsigned int n=((seed>>22)&0x3ff)+20; n>0; n--) xx = rotl(xx,52) - rotl(xx, 9);
+        for (unsigned int n=((seed>>11)&0x7ff)+20; n>0; n--) yy = rotl(yy,24) - rotl(yy,45);
+        for (unsigned int n=((seed    )&0x7ff)+20; n>0; n--) zz -= rotl(zz,38);
+    }
+    
+    uint64_t RersResrResdra::newValue() {  // Combined period = 2^116.23
+       xx = rotl(xx,8) - rotl(xx,29);                 //RERS,   period = 4758085248529 (prime)
+       yy = rotl(yy,21) - yy;  yy = rotl(yy,20);      //RESR,   period = 3841428396121 (prime)
+       zz = rotl(zz,42) - zz;  zz = zz + rotl(zz,14); //RESDRA, period = 5345004409 (prime)
+       return xx ^ yy ^ zz;
+    }
+    
+    void ThreeResr::setSeed(uint32_t seed) {
+        xx = 590009ULL;
+        yy = 8675416ULL;
+        zz = 46017471ULL;
+        for (unsigned int n=((seed>>22)&0x3ff)+20; n>0; n--) { xx = rotl(xx,43) - xx; xx = rotl(xx,27); }
+        for (unsigned int n=((seed>>11)&0x7ff)+20; n>0; n--) { yy = rotl(yy,21) - yy; yy = rotl(yy,20); }
+        for (unsigned int n=((seed    )&0x7ff)+20; n>0; n--) { zz = rotl(zz,51) - zz; zz = rotl(zz,26); }
+    }
+    
+    uint64_t ThreeResr::newValue() {  // Combined period = 2^123.32
+        xx = rotl(xx,43) - xx; xx = rotl(xx,27); // RESR, period =  9925159703554 = 2*53*93633582109
+        yy = rotl(yy,21) - yy; yy = rotl(yy,20); // RESR, period =  3841428396121 (prime)
+        zz = rotl(zz,51) - zz; zz = rotl(zz,26); // RESR, period =  348142888313 = 11*11*2877213953
+        return xx ^ yy ^ zz;
+    }
 
-template<class Chromosome, class Evaluation>
-PDe<Chromosome, Evaluation>::PDe() : parentIndex(0) {
 }
-
-
-template<class Chromosome, class Evaluation>
-void PDe<Chromosome, Evaluation>::performSelection(size_t targetIndex, Individual trial) {
-	if (trial < this->pop[targetIndex]) 
-		this->pop[targetIndex] = trial;
-}
-
-
-template<class Chromosome, class Evaluation>
-void PDe<Chromosome, Evaluation>::performTruncate() {
-}
-
-
-template<class Chromosome, class Evaluation>
-Chromosome PDe<Chromosome, Evaluation>::generateCandidate() {
-	Individual ret;
-	if (parentIndex >= this->pop.size())
-		parentIndex = 0;
-	//this->generateTrialSolution(this->pop, this->indices[parentIndex], ret);
-	this->generateTrialSolution(this->pop, parentIndex, ret);
-	++parentIndex;
-	return ret.chromosome;
-}
-
-
-#endif // DE_H_INCLUDED

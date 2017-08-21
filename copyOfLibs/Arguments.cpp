@@ -62,72 +62,87 @@
     }
 */
 
-#ifndef DE_H_INCLUDED
-#define DE_H_INCLUDED
+#include "Arguments.h"
 
 
-#include "DeBase.h"
-#include "ParallelNumericOptimizer.h"
-
-#include <map>
-
-
-/// ##################################################################################
-/// template class PDe
-/// used as an Algorithm policy for NumericOptimizer<...>;
-///
-template<class Chromosome, class Evaluation>
-class PDe : 
-	// inherit base DE definitions
-	public DeBase<IndividualStruc<Chromosome, typename Evaluation::Value, typename Evaluation::Properties> >, 
-	// make PDe conform the form of ParallelNumericOptimizer
-	public ParallelNumericOptimizer<PDe<Chromosome, Evaluation>, Chromosome, Evaluation> 
+Arguments::Arguments(int num, char** args)
+		: num_(num - 1),
+        args_(args) 
 {
-public:
-	friend class ParallelNumericOptimizer<PDe<Chromosome, Evaluation>, Chromosome, Evaluation>;
-	typedef typename ParallelNumericOptimizer<PDe<Chromosome, Evaluation>, Chromosome, Evaluation>::Individual Individual;
-	
-protected:
-	size_t parentIndex; // used in generateCandidate function
-	
-public:
-	PDe();
-
-protected:
-	void performTruncate();
-	void performSelection(size_t targetIndex, Individual trial);
-	
-	Chromosome generateCandidate();
-};
-
-
-template<class Chromosome, class Evaluation>
-PDe<Chromosome, Evaluation>::PDe() : parentIndex(0) {
 }
 
 
-template<class Chromosome, class Evaluation>
-void PDe<Chromosome, Evaluation>::performSelection(size_t targetIndex, Individual trial) {
-	if (trial < this->pop[targetIndex]) 
-		this->pop[targetIndex] = trial;
+const char* Arguments::programName() const {
+    return args_[0];
 }
 
 
-template<class Chromosome, class Evaluation>
-void PDe<Chromosome, Evaluation>::performTruncate() {
+int Arguments::size() const {
+    return num_;
 }
 
 
-template<class Chromosome, class Evaluation>
-Chromosome PDe<Chromosome, Evaluation>::generateCandidate() {
-	Individual ret;
-	if (parentIndex >= this->pop.size())
-		parentIndex = 0;
-	//this->generateTrialSolution(this->pop, this->indices[parentIndex], ret);
-	this->generateTrialSolution(this->pop, parentIndex, ret);
-	++parentIndex;
-	return ret.chromosome;
+const char* Arguments::argument(int num) const {
+    return args_[num + 1];
 }
 
 
-#endif // DE_H_INCLUDED
+const char* Arguments::operator[] (int num) const {
+    return args_[num + 1];
+}
+
+
+ArgumentsCStyle::ArgumentsCStyle(int num, char** args, char colon)
+        : Arguments(num, args) 
+{
+    for (int i=0; i<num_; ++i) {
+    	if (Arguments::operator[](i) == 0)
+			continue;
+        std::string                temp = Arguments::operator[](i);
+        for (unsigned int j=0; j<temp.size(); ++j) {
+            if (temp[j] == colon) {
+                argMap_[std::string(temp, 0, j)] = std::string(temp, j+1);
+                break;
+            }
+        }
+    }
+}
+
+
+const std::string& ArgumentsCStyle::operator[] (const std::string& name) const {
+    static std::string            notFound("");
+    StrStrMapIt                   it = argMap_.find(name);
+    if (it != argMap_.end())
+        return it->second;
+    else
+        return notFound;
+}
+
+
+DashArguments::DashArguments(int num, char** args) 
+   : Arguments(num, args)
+{
+	StrStrMapIt lastDashArg = dashArgs.end();
+	for (int i=0; i<num_; ++i) {
+		std::string temp = Arguments::operator[](i);
+	    if ((temp.size() > 1) && (temp[0] == '-') && (!isdigit(temp[1]))) {
+	    	lastDashArg = dashArgs.insert(std::make_pair(temp, std::string()));
+	    } else {
+			if ((dashArgs.size() > 0) && (lastDashArg->second == "")) {
+				lastDashArg->second = temp;
+			} else {
+				freeArgs.push_back(temp);
+			}
+	    }
+	}
+}
+
+
+const std::string& DashArguments::operator[] (const std::string& name) const {
+	static std::string            notFound("");
+	constStrStrMapIt              it = dashArgs.find(name);
+	if (it != dashArgs.end())
+		return it->second;
+	else
+		return notFound;
+}

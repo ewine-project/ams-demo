@@ -1,0 +1,14 @@
+#!/bin/bash
+# this script creates directories, which are required by pDEMO for multiprocessor execution
+# each directory provides the environment for one CPU (for input/output files)
+# run this script with one parameter - number of directories to meke
+for ((  i = 0 ;  i <= $1;  i++  ))
+do
+# make directory
+	var=`echo "process"$i`
+	mkdir $var
+# copy some stuff into the directory (depends on the problem to be solved)	
+	#cp -r Input `echo $var"/"`
+# create some subdirectories (if required by the problem)
+	#mkdir `echo $var"/Output"`
+done

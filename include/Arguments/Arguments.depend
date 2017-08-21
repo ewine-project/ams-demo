@@ -1,9 +1,0 @@
-# depslib dependency file v1.0
-1290709424 source:/home/matjaz/src/Arguments/Arguments.cpp
-	"Arguments.h"
-
-1292232199 source:/home/matjaz/src/Arguments/testArguments.cpp
-	<iostream>
-	<string>
-	<Arguments.h>
-

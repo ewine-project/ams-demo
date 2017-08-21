@@ -1,4 +1,0 @@
-# This file was written by the script xyz.py
-3.0
-112.41707
--100.0

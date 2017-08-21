@@ -1,8 +1,0 @@
-# CPUs = 1, MPI disabled
-random seed = 1469695497
-timer analysis:
-   evaluation:    98.2539
-   in/out:        0.073744
-   other:         0.010882
-  ---------------------------
-   total:         98.3385

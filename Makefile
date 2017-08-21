@@ -1,14 +1,20 @@
 COMPILEFLAGS = -g -c
-LINKFLAGS = -O3 -s -L../include -L../../lib -Llib -lrt -ldl -lIni -lArguments -lRandom
-CPPFLAGS = -O3 -s -I. -I.. -I../include -I../../include -Iinclude -std=c++0x
+LINKFLAGS = -O3 -s -L./include -L../lib -L./copyOfLibs -lrt -ldl -lIni -lArguments -lRandom
+CPPFLAGS = -O3 -s -I. -I.. -I./include -I./copyOfLibs -std=c++0x
 MPICXX = mpic++.mpich
+MPICXX = mpic++
 CXX = c++
 GENERAL_FILES = ParallelFramework.h ParallelNumericOptimizer.h GeneralOptimizationAlgorithm.h GeneralOptimizationAlgorithm.cpp pDemo.h pDe.h DeBase.h VectorArithmetics.h internalEval.h TypeWrapper.h Initializer.h
 H_FILES = Array.h ExternalEvaluation.h Initializer.h NumericOptimizer.h pDemo.h TypeWrapper.h DeBase.h GeneralOptimizationAlgorithm.h internalEval.h ParallelFramework.h utilities.h De.h HyperVolume.h jobDistributer.h ParallelNumericOptimizer.h TestFunctions.h VectorArithmetics.h Demo.h Individual.h mpiWrapper.h pDe.h timer.h
 
-all: AMS-DEMO DEMO
+all: directories AMS-DEMO DEMO
 	cp AMS-DEMO bin/
 	cp DEMO bin/
+	
+directories: bin
+
+bin:
+	mkdir -p bin
 	
 echo:
 	\# $(MPICXX) ${COMPILEFLAGS} ${CPPFLAGS} main.cpp
@@ -37,6 +43,6 @@ main.nompi.o: main.cpp ${PCH_FILES}
 	$(CXX) ${COMPILEFLAGS} ${CPPFLAGS} -DNO_MPI main.cpp -o main.nompi.o 
 
 clean:
-	rm -rf *.o 
+	rm -rf *.o AMS-DEMO DEMO
 
 
