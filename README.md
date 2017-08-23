@@ -78,3 +78,13 @@ There are several files that contain various information related to the complete
 ## Research
 
 1. When using AMS-DEMO please cite: http://www.mitpressjournals.org/doi/abs/10.1162/EVCO_a_00076
+
+
+## Acknowledgement 
+
+The research leading to these results has received funding from the European Horizon 2020 Programme project eWINE under grant agreement No. 688116.
+
+
+## contact person
+
+Matjaž Depolli, Jožef Stefan Institute, Jamova cesta 39, SI-1000, Slovenia, matjaz.depolli@ijs.si
